@@ -136,4 +136,4 @@ app.get('/', (req, res)=>{
     res.send('port openned')
 })
 
-app.listen(process.env.posrt || 5000)
+app.listen(process.env.PORT || 5000)
