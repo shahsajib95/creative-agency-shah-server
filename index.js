@@ -2,9 +2,10 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const MongoClient = require('mongodb').MongoClient;
+const ObjectId = require('mongodb').ObjectId
 const fileUpload = require('express-fileupload');
 const fs= require('fs-extra');
-require('dotenv').config()
+require('dotenv').config();
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.lirp7.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
 
@@ -58,7 +59,7 @@ client.connect(err => {
     })
 
     app.get('/allreviews', (req, res)=>{
-        allReview.find({})
+        allReview.find({}).limit(6)
         .toArray((err, documents)=>{
             res.send(documents)
         })
@@ -88,26 +89,37 @@ client.connect(err => {
 
     app.get('/allOrders', (req, res)=>{
         const email = req.query.email;
-
         orders.find({})
         .toArray((err, orders)=>{
             res.send(orders)
         })
     })
     app.get('/allOrders', (req, res)=>{
-        orders.find({})
-        .toArray((err, allOrders)=>{
-            res.send(allOrders)
-        })
+       
+        if(adminEmail.find({email: req.body.email})){
+            orders.find({})
+            .toArray((err, allOrders)=>{
+                res.send(allOrders)
+            })}
     })
+
     app.get('/myOrders', (req, res)=>{
         const email = req.query.email;
-        adminEmail.find({email: email})
-        .then(result=>{
-            orders.find({})
+        orders.find({email: email})
             .toArray((err, myOrders)=>{
             res.send(myOrders)
         })
+    })
+
+    app.patch('/updateStatus', (req, res)=>{
+        const id = req.body.id;
+        const status = req.body.status;
+        orders.updateOne({_id: ObjectId(req.body.id)},
+        {
+            $set: {status:  req.body.status}
+        })
+        .then(result=>{
+            res.send(result.modifiedCount > 0 )
         })
     })
 
