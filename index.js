@@ -95,8 +95,8 @@ client.connect(err => {
         })
     })
     app.get('/allOrders', (req, res)=>{
-       
-        if(adminEmail.find({email: req.body.email})){
+        console.log(email)
+        if(adminEmail.find({email: req.query.email})){
             orders.find({})
             .toArray((err, allOrders)=>{
                 res.send(allOrders)
@@ -104,7 +104,8 @@ client.connect(err => {
     })
 
     app.get('/myOrders', (req, res)=>{
-        const email = req.query.email;
+        const email =  req.query.email;
+        console.log(email)
         orders.find({email: email})
             .toArray((err, myOrders)=>{
             res.send(myOrders)
